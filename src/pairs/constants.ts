@@ -1,0 +1,1 @@
+export const TRADE_STRATEGY = Symbol('TRADE_STRATEGY');
