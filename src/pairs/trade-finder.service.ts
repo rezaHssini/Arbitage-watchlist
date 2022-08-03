@@ -28,7 +28,7 @@ export class TradeFinderService implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     const checkPricesDurationInSec = +this.getConfig(
       ConfigParamNames.CheckPricesInterval,
-      '900',
+      '10',
     );
     setInterval(async () => {
       console.log('Send get pairs request');
@@ -53,6 +53,10 @@ export class TradeFinderService implements OnModuleInit {
   }
   @CatchErrors()
   private async handleTrades(trades: TradeOpportiunity[]): Promise<void> {
+    if (trades.length === 0) {
+      return;
+    }
+
     const messages = [];
     for (let i = 0; i < trades.length; i += this.messageBatchSize) {
       const chunk = trades.slice(i, i + this.messageBatchSize);

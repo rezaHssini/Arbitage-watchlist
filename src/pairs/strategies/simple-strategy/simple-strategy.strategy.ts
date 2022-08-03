@@ -9,6 +9,10 @@ import {
 } from '../../interfaces/price.interface';
 import { IArbitageStrategy } from '../../interfaces/strategy.interface';
 import { TradeList } from './utils/trade-list';
+import { dexList } from './utils/dex-list';
+
+const nomalizedDexList = dexList.map((e) => e.toLowerCase());
+const checkExchanges = false;
 
 @Injectable()
 export class SimpleStrategy implements IArbitageStrategy {
@@ -33,7 +37,8 @@ export class SimpleStrategy implements IArbitageStrategy {
         }
       }
     });
-    return trades.get();
+
+    return this.filterByDex(trades.get());
   }
   private parsePriceOptions(prices: ExchangePrice): PricePlace[] {
     let exchangePrices = Object.entries(prices);
@@ -52,6 +57,16 @@ export class SimpleStrategy implements IArbitageStrategy {
     return 100 * result;
   }
   private getMinimumDifference(): number {
-    return +this.config.get(ConfigParamNames.MinimumPriceDifference, '25');
+    return +this.config.get(ConfigParamNames.MinimumPriceDifference);
+  }
+  private filterByDex(trades: TradeOpportiunity[]): TradeOpportiunity[] {
+    if (!checkExchanges) {
+      return;
+    }
+    return trades.filter(
+      (e) =>
+        nomalizedDexList.indexOf(e.originExchange.toLowerCase()) != -1 &&
+        nomalizedDexList.indexOf(e.destinationExchange.toLowerCase()) != -1,
+    );
   }
 }
